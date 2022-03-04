@@ -7,6 +7,7 @@ public class LevelMN : Singleton<LevelMN>
     [SerializeField] Area preArea;
     public int weigh = 10;
     public int heigh = 10;
+    
     [SerializeField] Transform holderArea;
 
     private Area[,] arryArea;
@@ -15,10 +16,17 @@ public class LevelMN : Singleton<LevelMN>
     [SerializeField] BallController preBall;
     [SerializeField] Transform transBallHoder;
 
+    List<BallController> listBallSpawnRandom;
     protected override void Awake()
     {
         base.Awake();
+        listBallSpawnRandom = new List<BallController>();
         CreateMap();
+    }
+
+    private void Start()
+    {
+        CreateRandomBall();
     }
     void CreateMap()
     {
@@ -210,19 +218,11 @@ public class LevelMN : Singleton<LevelMN>
         {
             // Left
             neighbourList.Add(arryArea[currentNode.x - 1, currentNode.y]);
-            // Left Down
-            //     if (currentNode.y - 1 >= 0) neighbourList.Add(arryArea[currentNode.x - 1, currentNode.y - 1]);
-            // Left Up
-            //     if (currentNode.y + 1 < heigh) neighbourList.Add(arryArea[currentNode.x - 1, currentNode.y + 1]);
         }
         if (currentNode.x + 1 < weigh)
         {
             // Right
             neighbourList.Add(arryArea[currentNode.x + 1, currentNode.y]);
-            // Right Down
-            //        if (currentNode.y - 1 >= 0) neighbourList.Add(arryArea[currentNode.x + 1, currentNode.y - 1]);
-            // Right Up
-            //       if (currentNode.y + 1 < heigh) neighbourList.Add(arryArea[currentNode.x + 1, currentNode.y + 1]);
         }
         // Down
         if (currentNode.y - 1 >= 0) neighbourList.Add(arryArea[currentNode.x, currentNode.y - 1]);
@@ -504,9 +504,36 @@ public class LevelMN : Singleton<LevelMN>
             i3 = (int)Random.Range(0, listArea.Count - 1);
         }
 
-        CreateBall(listArea[i1].x, listArea[i1].y); 
-        CreateBall(listArea[i2].x, listArea[i2].y); 
-        CreateBall(listArea[i3].x, listArea[i3].y); 
+        listBallSpawnRandom[0].SetPos(listArea[i1].x, listArea[i1].y);
+        arryArea[listArea[i1].x, listArea[i1].y].currentBall = listBallSpawnRandom[0];
+        CheckInstanceBall(listArea[i1].x, listArea[i1].y);
+
+        listBallSpawnRandom[1].SetPos(listArea[i2].x, listArea[i2].y);
+        arryArea[listArea[i2].x, listArea[i2].y].currentBall = listBallSpawnRandom[1];
+        CheckInstanceBall(listArea[i2].x, listArea[i2].y);
+
+        listBallSpawnRandom[2].SetPos(listArea[i3].x, listArea[i3].y);
+        arryArea[listArea[i3].x, listArea[i3].y].currentBall = listBallSpawnRandom[2];
+        CheckInstanceBall(listArea[i3].x, listArea[i3].y);
+
+
+    }
+
+    public void CreateRandomBall ()
+    {
+        listBallSpawnRandom.Clear();
+        CreateBallNext(4, 10);
+        CreateBallNext(5, 10);
+        CreateBallNext(6, 10);
+    }
+
+    void CreateBallNext (int posX , int posZ)
+    {
+        BallController itemBall = Instantiate(preBall, transBallHoder);
+        itemBall.transform.position = new Vector3((float)posX, 0.3f, (float)posZ);
+        int typeBall = (int)Random.Range(0, 4);
+        itemBall.SetTypeBall(typeBall);
+        listBallSpawnRandom.Add(itemBall);
     }
 
 }

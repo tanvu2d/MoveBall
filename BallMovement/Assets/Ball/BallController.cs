@@ -5,7 +5,7 @@ using System;
 public class BallController : MonoBehaviour
 {
 
-    bool isMoving = false;
+    
     Vector3 endPoint = new Vector3();
     public int x, y;
 
@@ -13,12 +13,33 @@ public class BallController : MonoBehaviour
 
     [SerializeField] Renderer renderer;
 
-
     private void Start()
     {
+        
         x = (int)(transform.position.x);
         y = (int)(transform.position.z);
+        if (  y < LevelMN.Instance.heigh )
         LevelMN.Instance.CheckInstanceBall(x, y);
+    }
+
+    private void OnMouseDown()
+    {
+        if (Input.GetMouseButtonDown (0))
+        {
+            GameMN.Instance.ClickNewBall(transform.position);
+
+        }
+    }
+
+    private void OnMouseDrag()
+    {
+        
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit raycashit))
+        {
+            GameMN.Instance.currentFadeBall.transform.position = new Vector3 (raycashit.point.x , 0.3f , raycashit.point.z);
+
+        }
     }
 
     private void OnMouseUp()
@@ -27,12 +48,14 @@ public class BallController : MonoBehaviour
         if (Physics.Raycast (ray , out RaycastHit raycashit))
         {
              endPoint = raycashit.point + new Vector3(0.5f, 0, 0.5f);
-            if (!isMoving && LevelMN.Instance.CheckCanMove((int)(endPoint.x), (int)(endPoint.z)))
+            if (!GameMN.Instance.isMoving && LevelMN.Instance.CheckCanMove((int)(endPoint.x), (int)(endPoint.z)))
             {
                 StartCoroutine(movePath()); 
             } 
             
         }
+
+        GameMN.Instance.currentFadeBall.SetActive(false);
     }
 
     IEnumerator movePath ()
@@ -42,18 +65,24 @@ public class BallController : MonoBehaviour
         int startX = (int)(transform.position.x);
         int startY = (int)(transform.position.z);
         int i = 0;
-        isMoving = true;
+        GameMN.Instance.isMoving = true;
         while (i < path.Count)
         {
             transform.position = path[i];
             i++;
             yield return wait;
         }
-        isMoving = false;
+        GameMN.Instance.isMoving = false;
         x = (int)(transform.position.x);
         y = (int)(transform.position.z);
-        LevelMN.Instance.SetAreaWall(startX, startY, x, y, this);
-        LevelMN.Instance.CheckEarnPoint(x, y);
+
+        if (path.Count > 0)
+        {
+            LevelMN.Instance.SetAreaWall(startX, startY, x, y, this);
+            LevelMN.Instance.CheckEarnPoint(x, y);
+            LevelMN.Instance.CreateRandomBall();
+        }    
+
 
     }
 
@@ -83,6 +112,13 @@ public class BallController : MonoBehaviour
 
         }
 
+    }
+
+    public void SetPos(int _x, int _y)
+    {
+        transform.position = new Vector3(_x, transform.position.y, _y);
+        x = (int)(transform.position.x);
+        y = (int)(transform.position.z);
     }
 }
 
