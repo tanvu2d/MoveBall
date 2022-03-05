@@ -19,16 +19,23 @@ public class LevelMN : Singleton<LevelMN>
 
     List<BallController> listBallSpawnRandom;
     public int amountSpawn = 10;
+
+    List<Area> listPosNextBall;
+    [SerializeField] Transform transBallTiniHoder;
+    [SerializeField] GameObject preTiniBall;
+    List<GameObject> listBallTini;
     protected override void Awake()
     {
         base.Awake();
         listBallSpawnRandom = new List<BallController>();
+        listPosNextBall = new List<Area>();
+        listBallTini = new List<GameObject>();
         CreateMap();
     }
 
     private void Start()
     {
-        CreateRandomBall();
+        RandomPosNextBall();
     }
     void CreateMap()
     {
@@ -468,6 +475,7 @@ public class LevelMN : Singleton<LevelMN>
         if (CheckCanSpawnBall())
         {
             Spaw3Ball();
+            RandomPosNextBall();
         }
         else
         {
@@ -496,46 +504,13 @@ public class LevelMN : Singleton<LevelMN>
     }
     public void Spaw3Ball()
     {
-        List<Area> listArea = new List<Area>();
-        for (int i =0; i < weigh; i++)
+        for (int i =0; i < listPosNextBall.Count; i++)
         {
-            for (int  j =  0; j  <heigh; j ++)
-            {
-                if (arryArea[i,j].currentBall == null )
-                {
-                    listArea.Add(arryArea[i, j]);
-                }
-            }
+            listBallSpawnRandom[i].SetPos(listPosNextBall[i].x, listPosNextBall[i].y);
+            arryArea[listPosNextBall[i].x, listPosNextBall[i].y].currentBall = listBallSpawnRandom[i];
+            listBallSpawnRandom[i].DoScaleXY(0f, 0.5f, 1f);
+            CheckInstanceBall(listPosNextBall[i].x, listPosNextBall[i].y);
         }
-
-        int i1 =  0;
-        int i2 =  0;
-        int i3 =  0;
-        while ( i1 == i2  && i2 == i3)
-        {
-            i1 = (int)Random.Range(0, listArea.Count - 1);
-            i2 = (int)Random.Range(0, listArea.Count - 1);
-            i3 = (int)Random.Range(0, listArea.Count - 1);
-        }
-
-        listBallSpawnRandom[0].SetPos(listArea[i1].x, listArea[i1].y);
-        arryArea[listArea[i1].x, listArea[i1].y].currentBall = listBallSpawnRandom[0];
-        listBallSpawnRandom[0].DoScaleXY(0f, 0.5f, 1f);
-        CheckInstanceBall(listArea[i1].x, listArea[i1].y);
-
-        listBallSpawnRandom[1].SetPos(listArea[i2].x, listArea[i2].y);
-        arryArea[listArea[i2].x, listArea[i2].y].currentBall = listBallSpawnRandom[1];
-        listBallSpawnRandom[1].DoScaleXY(0f, 0.5f, 1f);
-        CheckInstanceBall(listArea[i2].x, listArea[i2].y);
-
-        listBallSpawnRandom[2].SetPos(listArea[i3].x, listArea[i3].y);
-        arryArea[listArea[i3].x, listArea[i3].y].currentBall = listBallSpawnRandom[2];
-        listBallSpawnRandom[2].DoScaleXY(0f, 0.5f, 1f);
-        CheckInstanceBall(listArea[i3].x, listArea[i3].y);
-
-      
-
-
     }
 
     public void CreateRandomBall ()
@@ -561,6 +536,64 @@ public class LevelMN : Singleton<LevelMN>
         Destroy(i.gameObject);
         GameObject par = Instantiate(preParBallDestroy, i.transform.position, i.transform.rotation);
         Destroy(par, 1f);
+    }
+
+    public void RandomPosNextBall ()
+    {
+        CreateRandomBall();
+        listPosNextBall.Clear();
+        List<Area> listArea = new List<Area>();
+        List<int> lisPos = new List<int>();
+        for (int i = 0; i < weigh; i++)
+        {
+            for (int j = 0; j < heigh; j++)
+            {
+                if (arryArea[i, j].currentBall == null)
+                {
+                    listArea.Add(arryArea[i, j]);
+                }
+            }
+        }
+
+        int i1 = 0;
+        int i2 = 0;
+        int i3 = 0;
+        while (i1 == i2 && i2 == i3)
+        {
+            i1 = (int)Random.Range(0, listArea.Count - 1);
+            i2 = (int)Random.Range(0, listArea.Count - 1);
+            i3 = (int)Random.Range(0, listArea.Count - 1);
+        }
+        listPosNextBall.Add(listArea[i1]);
+        listPosNextBall.Add(listArea[i2]);
+        listPosNextBall.Add(listArea[i3]);
+
+        lisPos.Add(i1);
+        lisPos.Add(i2);
+        lisPos.Add(i3);
+
+        if (listBallTini.Count == 0)
+        {
+           
+            for (int i =0; i< lisPos.Count; i ++)
+            {
+                GameObject bal = Instantiate(preTiniBall, transBallTiniHoder);
+                bal.transform.position = new Vector3(listArea[lisPos[i]].x, 0.1f, listArea[lisPos[i]].y);
+                bal.GetComponent<Renderer>().material.color =
+                    listBallSpawnRandom[i].GetComponent<Renderer>().material.color;
+                listBallTini.Add(bal);
+            }
+        }
+        else
+        {
+            for (int i =0; i < listBallTini.Count; i ++)
+            {
+                listBallTini[i].transform.position = new Vector3(listArea[lisPos[i]].x, 0.1f, listArea[lisPos[i]].y);
+                listBallTini[i].GetComponent<Renderer>().material.color =
+                    listBallSpawnRandom[i].GetComponent<Renderer>().material.color;
+            }
+        }
+        
     }
 }
             
