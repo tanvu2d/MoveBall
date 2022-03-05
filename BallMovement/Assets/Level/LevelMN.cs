@@ -15,8 +15,10 @@ public class LevelMN : Singleton<LevelMN>
     private const int MOVE_STRAIGHT_COST = 10;
     [SerializeField] BallController preBall;
     [SerializeField] Transform transBallHoder;
+    [SerializeField] GameObject preParBallDestroy;
 
     List<BallController> listBallSpawnRandom;
+    public int amountSpawn = 10;
     protected override void Awake()
     {
         base.Awake();
@@ -55,26 +57,38 @@ public class LevelMN : Singleton<LevelMN>
         itemBall.transform.position = new Vector3((float)posX, 0.3f, (float)posZ );
         int typeBall = (int)Random.Range(0, 4);
         itemBall.SetTypeBall(typeBall);
+        itemBall.DoScaleXY(0f, 0.5f, 1f);
         arryArea[posX, posZ].currentBall = itemBall;
 
     }
 
     void CreateBallLV()
     {
-        for (int i = 0; i < weigh; i = i + 3)
+        List<Area> listSpawn = new List<Area>();
+        for (int i = 0; i < weigh;  i++)
         {
-            for (int j = 0; j < heigh; j = j + 3)
+            for (int j = 0; j < heigh; j++)
             {
-                CreateBall(i, j);
+              if (arryArea[i,j].currentBall == null)
+                {
+                    listSpawn.Add(arryArea[i,j]);
+                }
+            }
+        }
+        Debug.Log("count null" + listSpawn.Count);
+        int count = 0;
+        List<int> listRandom = new List<int>();
+        while (count < amountSpawn)
+        {
+            int index = Random.Range(0, listSpawn.Count);
+            if (!listRandom.Contains(index))
+            {
+                CreateBall(listSpawn[index].x, listSpawn[index].y);
+                listRandom.Add(index);
+                count++;
             }
         }
 
-
-        CreateBall(1, 7);
-        CreateBall(2, 8);
-        CreateBall(1, 6);
-        CreateBall(2, 7);
-        CreateBall(3, 8);
     }
     Area GetItemArr(Vector3 pointWorld, out int x, out int y)
 
@@ -403,7 +417,7 @@ public class LevelMN : Singleton<LevelMN>
             foreach (BallController i in listLeftRight)
             {
                 arryArea[i.x, i.y].currentBall = null;
-                Destroy(i.gameObject);
+                DestroyBall(i);
                 ScoreMN.Instance.SetMyScore(1);
             }
         }
@@ -413,7 +427,7 @@ public class LevelMN : Singleton<LevelMN>
             foreach (BallController i in listUpDown)
             {
                 arryArea[i.x, i.y].currentBall = null;
-                Destroy(i.gameObject);
+                DestroyBall(i);
                 ScoreMN.Instance.SetMyScore(1);
             }
         }
@@ -423,7 +437,7 @@ public class LevelMN : Singleton<LevelMN>
             foreach (BallController i in listDiagonalRight)
             {
                 arryArea[i.x, i.y].currentBall = null;
-                Destroy(i.gameObject);
+                DestroyBall(i);
                 ScoreMN.Instance.SetMyScore(1);
             }
         }
@@ -433,7 +447,7 @@ public class LevelMN : Singleton<LevelMN>
             foreach (BallController i in listDiagonalLeft)
             {
                 arryArea[i.x, i.y].currentBall = null;
-                Destroy(i.gameObject);
+                DestroyBall(i);
                 ScoreMN.Instance.SetMyScore(1);
             }
         }
@@ -443,7 +457,7 @@ public class LevelMN : Singleton<LevelMN>
 
             BallController ball = arryArea[x, y].currentBall;
             arryArea[x, y].currentBall = null;
-            Destroy(ball.gameObject);
+            DestroyBall(ball);
             ScoreMN.Instance.SetMyScore(1);
         }
     }
@@ -506,15 +520,20 @@ public class LevelMN : Singleton<LevelMN>
 
         listBallSpawnRandom[0].SetPos(listArea[i1].x, listArea[i1].y);
         arryArea[listArea[i1].x, listArea[i1].y].currentBall = listBallSpawnRandom[0];
+        listBallSpawnRandom[0].DoScaleXY(0f, 0.5f, 1f);
         CheckInstanceBall(listArea[i1].x, listArea[i1].y);
 
         listBallSpawnRandom[1].SetPos(listArea[i2].x, listArea[i2].y);
         arryArea[listArea[i2].x, listArea[i2].y].currentBall = listBallSpawnRandom[1];
+        listBallSpawnRandom[1].DoScaleXY(0f, 0.5f, 1f);
         CheckInstanceBall(listArea[i2].x, listArea[i2].y);
 
         listBallSpawnRandom[2].SetPos(listArea[i3].x, listArea[i3].y);
         arryArea[listArea[i3].x, listArea[i3].y].currentBall = listBallSpawnRandom[2];
+        listBallSpawnRandom[2].DoScaleXY(0f, 0.5f, 1f);
         CheckInstanceBall(listArea[i3].x, listArea[i3].y);
+
+      
 
 
     }
@@ -536,6 +555,13 @@ public class LevelMN : Singleton<LevelMN>
         listBallSpawnRandom.Add(itemBall);
     }
 
+
+    void DestroyBall (BallController i)
+    {
+        Destroy(i.gameObject);
+        GameObject par = Instantiate(preParBallDestroy, i.transform.position, i.transform.rotation);
+        Destroy(par, 1f);
+    }
 }
             
             

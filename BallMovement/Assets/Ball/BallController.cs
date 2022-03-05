@@ -75,10 +75,10 @@ public class BallController : MonoBehaviour
         GameMN.Instance.isMoving = false;
         x = (int)(transform.position.x);
         y = (int)(transform.position.z);
+        LevelMN.Instance.SetAreaWall(startX, startY, x, y, this);
 
         if (path.Count > 0)
-        {
-            LevelMN.Instance.SetAreaWall(startX, startY, x, y, this);
+        {          
             LevelMN.Instance.CheckEarnPoint(x, y);
             LevelMN.Instance.CreateRandomBall();
         }    
@@ -91,8 +91,8 @@ public class BallController : MonoBehaviour
         switch (amount)
         {
             case 0:
-                typeBall = TypeBall.white;
-                renderer.material.color = Color.white;
+                typeBall = TypeBall.blue;
+                renderer.material.color = Color.blue;
 
                 break;
             case 1:
@@ -120,11 +120,37 @@ public class BallController : MonoBehaviour
         x = (int)(transform.position.x);
         y = (int)(transform.position.z);
     }
+
+
+     IEnumerator IEDoScaleXY( float from, float to , float _time )
+    {
+        float timeCount = Time.deltaTime;
+        int cout = 0;
+        while (timeCount < _time) 
+        {
+            Vector3 scale = transform.localScale;
+            scale.y = from;
+            scale.x = from;
+            transform.localScale = scale;
+            from = (timeCount/_time)/2f;
+            timeCount += Time.deltaTime;
+            cout++;
+            yield return null;
+        }
+    }
+
+    public void DoScaleXY ( float from, float to, float _time)
+    {
+        StartCoroutine(IEDoScaleXY( from, to, _time));
+    }
+
+
+
 }
 
 public enum TypeBall
 {
-    white,
+    blue,
     red, 
     black,
     yellow,

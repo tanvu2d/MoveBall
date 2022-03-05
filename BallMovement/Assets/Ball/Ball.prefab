@@ -99,7 +99,6 @@ MonoBehaviour:
   y: 0
   typeBall: 0
   renderer: {fileID: 7731137475386564703}
-  preFadeBall: {fileID: 4212243876023027426, guid: 6f692a4a38c665a4bac2740a21894161, type: 3}
 --- !u!135 &651835933684618
 SphereCollider:
   m_ObjectHideFlags: 0
