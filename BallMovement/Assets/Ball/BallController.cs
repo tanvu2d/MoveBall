@@ -76,7 +76,7 @@ public class BallController : MonoBehaviour
         x = (int)(transform.position.x);
         y = (int)(transform.position.z);
         LevelMN.Instance.SetAreaWall(startX, startY, x, y, this);
-
+        LevelMN.Instance.CheckOverLapBall(x, y);
         if (path.Count > 0)
         {          
             LevelMN.Instance.CheckEarnPoint(x, y);

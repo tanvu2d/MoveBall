@@ -595,6 +595,36 @@ public class LevelMN : Singleton<LevelMN>
         }
         
     }
+
+    public void CheckOverLapBall (int x , int y )
+    {
+        Area area = arryArea[x, y];
+
+        if (listPosNextBall.Contains (area))
+        {
+            listPosNextBall.Remove(area);
+
+            List<Area> listArea = new List<Area>();
+            for (int i = 0; i < weigh; i++)
+            {
+                for (int j = 0; j < heigh; j++)
+                {
+                    if (arryArea[i, j].currentBall == null)
+                    {
+                        listArea.Add(arryArea[i, j]);
+                    }
+                }
+            }
+
+            listPosNextBall.Add(listArea[(int)Random.Range(0, listArea.Count - 1)]);
+        }
+
+       
+
+
+    }
+
+
 }
             
             
