@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7503152375911661363}
   - component: {fileID: 651835933684618}
   m_Layer: 0
-  m_Name: Ball 1
+  m_Name: GhostBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6a15b1f15432b6f4b9a8066e1e6ca4df, type: 2}
+  - {fileID: 2100000, guid: 3e8aaeb35664643498f64407f7f22401, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -99,7 +99,6 @@ MonoBehaviour:
   y: 0
   typeBall: 0
   renderer: {fileID: 7731137475386564703}
-  materialGhost: {fileID: 2100000, guid: 3e8aaeb35664643498f64407f7f22401, type: 2}
 --- !u!135 &651835933684618
 SphereCollider:
   m_ObjectHideFlags: 0
