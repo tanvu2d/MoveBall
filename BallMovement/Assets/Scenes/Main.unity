@@ -308,6 +308,8 @@ MonoBehaviour:
   transBallTiniHoder: {fileID: 600084202}
   preTiniBall: {fileID: 4212243876023027426, guid: d36f0a6d328862d41ab20d81c5ea8532,
     type: 3}
+  preDeathBall: {fileID: -423359082436733056, guid: 5dd362c0b8142a544b9099cfca4c4c4d,
+    type: 3}
 --- !u!4 &306505124
 Transform:
   m_ObjectHideFlags: 0

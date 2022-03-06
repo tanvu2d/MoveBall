@@ -7,7 +7,7 @@ public class LevelMN : Singleton<LevelMN>
     [SerializeField] Area preArea;
     public int weigh = 10;
     public int heigh = 10;
-    
+
     [SerializeField] Transform holderArea;
 
     private Area[,] arryArea;
@@ -24,6 +24,8 @@ public class LevelMN : Singleton<LevelMN>
     [SerializeField] Transform transBallTiniHoder;
     [SerializeField] GameObject preTiniBall;
     List<GameObject> listBallTini;
+
+    [SerializeField] SpecialBallController preDeathBall;
     protected override void Awake()
     {
         base.Awake();
@@ -55,34 +57,45 @@ public class LevelMN : Singleton<LevelMN>
         }
 
         CreateBallLV();
+        CreateSpecialBall(4, 5);
+        CreateSpecialBall(7, 5);
     }
 
     public void CreateBall(int posX, int posZ)
     {
 
         BallController itemBall = Instantiate(preBall, transBallHoder);
-        itemBall.transform.position = new Vector3((float)posX, 0.3f, (float)posZ );
-        int typeBall = (int)Random.Range(0, 4);
+        itemBall.transform.position = new Vector3((float)posX, 0.3f, (float)posZ);
+        int typeBall = (int)Random.Range(0, 5);
         itemBall.SetTypeBall(typeBall);
         itemBall.DoScaleXY(0f, 0.5f, 1f);
         arryArea[posX, posZ].currentBall = itemBall;
 
     }
+    public void CreateSpecialBall(int posX, int posZ)
+    {
+
+        SpecialBallController itemBall = Instantiate(preDeathBall, transBallHoder);
+        itemBall.transform.position = new Vector3((float)posX, 0.3f, (float)posZ);
+        itemBall.DoScaleXY(0f, 0.5f, 1f);
+        arryArea[posX, posZ].hasOtherBall = true;
+        arryArea[posX, posZ].currentDeathBall = itemBall;
+    }
+
 
     void CreateBallLV()
     {
         List<Area> listSpawn = new List<Area>();
-        for (int i = 0; i < weigh;  i++)
+        for (int i = 0; i < weigh; i++)
         {
             for (int j = 0; j < heigh; j++)
             {
-              if (arryArea[i,j].currentBall == null)
+                if (arryArea[i, j].currentBall == null && !arryArea[i, j].hasOtherBall)
                 {
-                    listSpawn.Add(arryArea[i,j]);
+                    listSpawn.Add(arryArea[i, j]);
                 }
             }
         }
-        Debug.Log("count null" + listSpawn.Count);
         int count = 0;
         List<int> listRandom = new List<int>();
         while (count < amountSpawn)
@@ -108,9 +121,11 @@ public class LevelMN : Singleton<LevelMN>
     public List<Vector3> FindPath(Vector3 startPointEv, Vector3 EndPointEv)
     {
         Area startArea = GetItemArr(startPointEv, out int startX, out int startZ);
-        Area endArea = GetItemArr(EndPointEv, out int endX, out int endZ);
-
+        Area endArea = GetItemArr(EndPointEv, out int endX, out int endZ);      
         List<Area> path = FindPath(startX, startZ, endX, endZ);
+        
+        
+        
         if (path == null)
         {
             return null;
@@ -170,11 +185,19 @@ public class LevelMN : Singleton<LevelMN>
             foreach (Area neighbourNode in GetNeighbourList(currentNode))
             {
                 if (closedList.Contains(neighbourNode)) continue;
-                if (neighbourNode.currentBall != null)
+
+                if (startNode.currentBall.typeBall != TypeBall.ghost)
                 {
-                    closedList.Add(neighbourNode);
-                    continue;
+                    if (neighbourNode.currentBall != null || neighbourNode.hasOtherBall)
+                    {
+                        closedList.Add(neighbourNode);
+                        continue;
+
+                    }
                 }
+
+              
+
                 int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNode, neighbourNode);
                 if (tentativeGCost < neighbourNode.gCost)
                 {
@@ -194,6 +217,8 @@ public class LevelMN : Singleton<LevelMN>
         closedList.Clear();
         return closedList;
     }
+
+   
 
     int CalculateDistanceCost(Area a, Area b)
     {
@@ -316,7 +341,7 @@ public class LevelMN : Singleton<LevelMN>
             if (i > 9)
                 break;
 
-            if (arryArea[x, i].currentBall != null )
+            if (arryArea[x, i].currentBall != null)
             {
                 if (arryArea[x, i].currentBall.typeBall != _currentBall.typeBall)
                     break;
@@ -333,7 +358,7 @@ public class LevelMN : Singleton<LevelMN>
             if (i < 0)
                 break;
 
-            if (arryArea[x, i].currentBall != null )
+            if (arryArea[x, i].currentBall != null)
             {
                 if (arryArea[x, i].currentBall.typeBall != _currentBall.typeBall)
                     break;
@@ -406,7 +431,7 @@ public class LevelMN : Singleton<LevelMN>
             if (i < 0 || j3 > 9)
                 break;
 
-            if (arryArea[i, j3].currentBall != null )
+            if (arryArea[i, j3].currentBall != null)
             {
                 if (arryArea[i, j3].currentBall.typeBall != _currentBall.typeBall)
                     break;
@@ -469,7 +494,7 @@ public class LevelMN : Singleton<LevelMN>
         }
     }
 
-    public void CheckEarnPoint (int x , int y )
+    public void CheckEarnPoint(int x, int y)
     {
         CheckInstanceBall(x, y);
         if (CheckCanSpawnBall())
@@ -483,14 +508,14 @@ public class LevelMN : Singleton<LevelMN>
         }
     }
 
-    public bool CheckCanSpawnBall ()
+    public bool CheckCanSpawnBall()
     {
         List<Area> listArea = new List<Area>();
         for (int i = 0; i < weigh; i++)
         {
             for (int j = 0; j < heigh; j++)
             {
-                if (arryArea[i, j].currentBall == null)
+                if (arryArea[i, j].currentBall == null && !arryArea[i, j].hasOtherBall)
                 {
                     listArea.Add(arryArea[i, j]);
                 }
@@ -504,7 +529,7 @@ public class LevelMN : Singleton<LevelMN>
     }
     public void Spaw3Ball()
     {
-        for (int i =0; i < listPosNextBall.Count; i++)
+        for (int i = 0; i < listPosNextBall.Count; i++)
         {
             listBallSpawnRandom[i].SetPos(listPosNextBall[i].x, listPosNextBall[i].y);
             arryArea[listPosNextBall[i].x, listPosNextBall[i].y].currentBall = listBallSpawnRandom[i];
@@ -513,7 +538,7 @@ public class LevelMN : Singleton<LevelMN>
         }
     }
 
-    public void CreateRandomBall ()
+    public void CreateRandomBall()
     {
         listBallSpawnRandom.Clear();
         CreateBallNext(4, 10);
@@ -521,7 +546,7 @@ public class LevelMN : Singleton<LevelMN>
         CreateBallNext(6, 10);
     }
 
-    void CreateBallNext (int posX , int posZ)
+    void CreateBallNext(int posX, int posZ)
     {
         BallController itemBall = Instantiate(preBall, transBallHoder);
         itemBall.transform.position = new Vector3((float)posX, 0.3f, (float)posZ);
@@ -531,14 +556,14 @@ public class LevelMN : Singleton<LevelMN>
     }
 
 
-    void DestroyBall (BallController i)
+    void DestroyBall(BallController i)
     {
         Destroy(i.gameObject);
         GameObject par = Instantiate(preParBallDestroy, i.transform.position, i.transform.rotation);
         Destroy(par, 1f);
     }
 
-    public void RandomPosNextBall ()
+    public void RandomPosNextBall()
     {
         CreateRandomBall();
         listPosNextBall.Clear();
@@ -548,7 +573,7 @@ public class LevelMN : Singleton<LevelMN>
         {
             for (int j = 0; j < heigh; j++)
             {
-                if (arryArea[i, j].currentBall == null)
+                if (arryArea[i, j].currentBall == null && !arryArea[i, j].hasOtherBall)
                 {
                     listArea.Add(arryArea[i, j]);
                 }
@@ -574,8 +599,8 @@ public class LevelMN : Singleton<LevelMN>
 
         if (listBallTini.Count == 0)
         {
-           
-            for (int i =0; i< lisPos.Count; i ++)
+
+            for (int i = 0; i < lisPos.Count; i++)
             {
                 GameObject bal = Instantiate(preTiniBall, transBallTiniHoder);
                 bal.transform.position = new Vector3(listArea[lisPos[i]].x, 0.1f, listArea[lisPos[i]].y);
@@ -586,21 +611,21 @@ public class LevelMN : Singleton<LevelMN>
         }
         else
         {
-            for (int i =0; i < listBallTini.Count; i ++)
+            for (int i = 0; i < listBallTini.Count; i++)
             {
                 listBallTini[i].transform.position = new Vector3(listArea[lisPos[i]].x, 0.1f, listArea[lisPos[i]].y);
                 listBallTini[i].GetComponent<Renderer>().material.color =
                     listBallSpawnRandom[i].GetComponent<Renderer>().material.color;
             }
         }
-        
+
     }
 
-    public void CheckOverLapBall (int x , int y )
+    public void CheckOverLapBall(int x, int y)
     {
         Area area = arryArea[x, y];
 
-        if (listPosNextBall.Contains (area))
+        if (listPosNextBall.Contains(area))
         {
             listPosNextBall.Remove(area);
 
@@ -609,7 +634,7 @@ public class LevelMN : Singleton<LevelMN>
             {
                 for (int j = 0; j < heigh; j++)
                 {
-                    if (arryArea[i, j].currentBall == null)
+                    if (arryArea[i, j].currentBall == null && !arryArea[i, j].hasOtherBall)
                     {
                         listArea.Add(arryArea[i, j]);
                     }
@@ -619,17 +644,63 @@ public class LevelMN : Singleton<LevelMN>
             listPosNextBall.Add(listArea[(int)Random.Range(0, listArea.Count - 1)]);
         }
 
-       
+
 
 
     }
 
 
-}
-            
-            
-            
+    public void ClickDeathBall(int x, int y)
+    {
+        List<Area> listAreaDestroy = new List<Area>();
+        for (int i = 0; i < weigh; i++)
+        {
+            listAreaDestroy.Add(arryArea[i, y]);
+        }
 
-        
-    
+        listAreaDestroy.Remove(arryArea[x, y]);
+
+        for (int i = 0; i < heigh; i++)
+        {
+            listAreaDestroy.Add(arryArea[x, i]);
+        }
+        listAreaDestroy.Remove(arryArea[x, y]);
+
+        foreach (Area i in listAreaDestroy)
+        {
+            if (i.currentBall != null)
+            {
+                BallController ball = i.currentBall;
+                i.currentBall = null;
+                DestroyBall(ball);
+            }
+            else if (i.hasOtherBall)
+            {
+                arryArea[x, y].hasOtherBall = false;
+                ClickDeathBall(i.x, i.y);
+            }
+            else
+            {
+                GameObject par = Instantiate(preParBallDestroy, i.transform.position, i.transform.rotation);
+                Destroy(par, 1f);
+            }
+
+
+        }
+        Destroy(arryArea[x, y].currentDeathBall.gameObject);
+
+
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
 

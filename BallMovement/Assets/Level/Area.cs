@@ -15,6 +15,9 @@ public class Area : MonoBehaviour
 
     public Area cameFromNode;
 
+    public bool hasOtherBall = false;
+
+    public SpecialBallController currentDeathBall;
     public void CalculateFCost()
     {
         fCost = gCost + hCost;

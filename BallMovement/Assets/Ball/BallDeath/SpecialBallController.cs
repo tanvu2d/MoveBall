@@ -2,11 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpecialBallController : BallController
+public class SpecialBallController : Ball
 {
 
-     void OnMouseDown ()
+    private void Start()
     {
-        Debug.Log("done");
+
+        x = (int)(transform.position.x);
+        y = (int)(transform.position.z);
+    }
+    void OnMouseDown()
+    {
+        LevelMN.Instance.ClickDeathBall(x, y);
     }
 }
