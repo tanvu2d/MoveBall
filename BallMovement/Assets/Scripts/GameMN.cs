@@ -12,7 +12,7 @@ public class GameMN : Singleton <GameMN>
     [HideInInspector]
     public GameObject currentFadeBall;
 
-    
+    [SerializeField] LineRenderer lr;
 
     private void Start()
     {
@@ -30,5 +30,14 @@ public class GameMN : Singleton <GameMN>
         
         currentFadeBall.SetActive(true);
         currentFadeBall.transform.position = _trans;
+    }
+
+    public void SetLine(List <Vector3> points)
+    {
+        lr.positionCount = points.Count;
+        for (int i = 0; i < points.Count; i++)
+        {
+            lr.SetPosition(i, points[i]);
+        }
     }
 }

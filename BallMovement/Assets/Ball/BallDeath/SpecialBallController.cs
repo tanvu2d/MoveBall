@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class SpecialBallController : Ball
 {
-
     private void Start()
     {
-
         x = (int)(transform.position.x);
         y = (int)(transform.position.z);
     }
