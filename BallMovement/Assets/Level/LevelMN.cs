@@ -26,6 +26,8 @@ public class LevelMN : Singleton<LevelMN>
     List<GameObject> listBallTini;
 
     [SerializeField] SpecialBallController preDeathBall;
+    int turnChoose = 0;
+    public int AmountTurnSpawnSpecialBall = 10;
     protected override void Awake()
     {
         base.Awake();
@@ -57,8 +59,6 @@ public class LevelMN : Singleton<LevelMN>
         }
 
         CreateBallLV();
-        CreateSpecialBall(4, 5);
-        CreateSpecialBall(7, 5);
     }
 
     public void CreateBall(int posX, int posZ)
@@ -72,14 +72,30 @@ public class LevelMN : Singleton<LevelMN>
         arryArea[posX, posZ].currentBall = itemBall;
 
     }
-    public void CreateSpecialBall(int posX, int posZ)
+    public void CreateSpecialBall()
     {
+        List<Area> listEmptyArea = new List<Area>();
+
+        for (int i =0; i < weigh; i++)
+        {
+            for (int j = 0; j < heigh; j++ )
+            {
+                if (arryArea[i,j].currentBall == null  && !arryArea[i,j].hasOtherBall)
+                {
+                    listEmptyArea.Add(arryArea[i, j]);
+                }
+            }
+        }
+
+        Area areaChoose = listEmptyArea[Random.Range(0, listEmptyArea.Count)];
+
+
 
         SpecialBallController itemBall = Instantiate(preDeathBall, transBallHoder);
-        itemBall.transform.position = new Vector3((float)posX, 0.3f, (float)posZ);
+        itemBall.transform.position = new Vector3((float)areaChoose.x, 0.3f, (float)areaChoose.y);
         itemBall.DoScaleXY(0f, 0.5f, 1f);
-        arryArea[posX, posZ].hasOtherBall = true;
-        arryArea[posX, posZ].currentDeathBall = itemBall;
+        arryArea[areaChoose.x, areaChoose.y].hasOtherBall = true;
+        arryArea[areaChoose.x, areaChoose.y].currentDeathBall = itemBall;
     }
 
 
@@ -529,6 +545,12 @@ public class LevelMN : Singleton<LevelMN>
     }
     public void Spaw3Ball()
     {
+        turnChoose++; 
+        if (turnChoose % AmountTurnSpawnSpecialBall == 0 )
+        {
+            CreateSpecialBall();
+        }
+
         for (int i = 0; i < listPosNextBall.Count; i++)
         {
             listBallSpawnRandom[i].SetPos(listPosNextBall[i].x, listPosNextBall[i].y);

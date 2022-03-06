@@ -310,6 +310,7 @@ MonoBehaviour:
     type: 3}
   preDeathBall: {fileID: -423359082436733056, guid: 5dd362c0b8142a544b9099cfca4c4c4d,
     type: 3}
+  AmountTurnSpawnSpecialBall: 10
 --- !u!4 &306505124
 Transform:
   m_ObjectHideFlags: 0
@@ -783,7 +784,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 11111111111
+  m_Text: 
 --- !u!222 &1138852367
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -983,7 +984,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 11111111111
+  m_Text: 
 --- !u!222 &1269506644
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1192,7 +1193,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 11111111
+  m_Text: 
 --- !u!222 &1701340834
 CanvasRenderer:
   m_ObjectHideFlags: 0
